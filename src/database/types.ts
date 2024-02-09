@@ -30,12 +30,11 @@ export interface Screenings {
   screenId: number
   movieId: number
   totalTickets: number
+  takenTickets: number
 }
 
 export interface Seats {
   screenId: number
-  seat: string
-  taken: boolean
   userId: number
 }
 
