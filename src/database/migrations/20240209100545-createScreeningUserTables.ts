@@ -28,7 +28,7 @@ export async function up(db: Kysely<SqliteDatabase>) {
     .addColumn('user_id', 'integer', (c) => c.notNull().references('users.id'))
     .execute()
 }
-export async function down() {
+export async function down(db: Kysely<SqliteDatabase>) {
   await db.schema.dropTable('screening_seats').execute()
   await db.schema.dropTable('users').execute()
   await db.schema.dropTable('screening').execute()
