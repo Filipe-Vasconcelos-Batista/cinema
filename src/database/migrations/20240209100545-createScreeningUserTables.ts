@@ -10,49 +10,26 @@ export async function up(db: Kysely<SqliteDatabase>) {
       c.notNull().references('movies.id')
     )
     .addColumn('total_tickets', 'integer', (c) => c.notNull())
+    .addColumn('taken_tickets', 'integer', (c) => c.notNull())
     .execute()
 
   await db.schema
-    .createTable('people')
+    .createTable('users')
     .ifNotExists()
     .addColumn('id', 'integer', (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn('name', 'text', (c) => c.notNull())
-    .addColumn('birth', 'numeric')
     .execute()
 
   await db.schema
-    .createTable('stars')
+    .createTable('screening_seats')
     .ifNotExists()
-    .addColumn('movie_id', 'integer', (c) =>
-      c.notNull().references('movies.id')
+    .addColumn('screening_id', 'integer', (c) =>
+      c.notNull().references('screening.id')
     )
-    .addColumn('person_id', 'integer', (c) =>
-      c.notNull().references('people.id')
-    )
-    .execute()
-
-  await db.schema
-    .createTable('directors')
-    .ifNotExists()
-    .addColumn('movie_id', 'integer', (c) =>
-      c.notNull().references('movies.id')
-    )
-    .addColumn('person_id', 'integer', (c) =>
-      c.notNull().references('people.id')
-    )
-    .execute()
-
-  await db.schema
-    .createTable('ratings')
-    .ifNotExists()
-    .addColumn('movie_id', 'integer', (c) =>
-      c.notNull().references('movies.id')
-    )
-    .addColumn('rating', 'real', (c) => c.notNull())
-    .addColumn('votes', 'integer', (c) => c.notNull())
+    .addColumn('user_id', 'integer', (c) => c.notNull().references('users.id'))
     .execute()
 }
-
 export async function down() {
-  // unnecessary, as this is the first migration, we can just delete the database
+  await db.schema.dropTable('screening_seats').execute()
+  await db.schema.dropTable('users').execute()
+  await db.schema.dropTable('screening').execute()
 }
