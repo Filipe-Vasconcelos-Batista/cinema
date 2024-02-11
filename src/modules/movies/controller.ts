@@ -9,10 +9,10 @@ export default (db: Database) => {
 
   router.get(
     '/',
-    jsonRoute(async () => {
-      // a hard-coded solution for your first controller test
-      const ids = [133093, 816692] // TODO: get ids from query params
-      const movies = await messages.findByIds(ids)
+    jsonRoute(async (req) => {
+      const idsParam = req.query.id as string
+      const idsArray = idsParam ? idsParam.split(',').map(Number) : []
+      const movies = await messages.findByIds(idsArray)
 
       return movies
     })
