@@ -9,6 +9,7 @@ export async function up(db: Kysely<SqliteDatabase>) {
     .addColumn('movie_id', 'integer', (c) =>
       c.notNull().references('movies.id')
     )
+    .addColumn('time', 'text', (c) => c.notNull())
     .addColumn('total_tickets', 'integer', (c) => c.notNull())
     .addColumn('taken_tickets', 'integer', (c) => c.notNull())
     .execute()
