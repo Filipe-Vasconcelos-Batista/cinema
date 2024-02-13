@@ -7,6 +7,13 @@ import { Screening } from './schema'
 export default (db: Database) => {
   const messages = buildRespository(db)
   const router = Router()
+  router.get(
+    '/',
+    jsonRoute(async (req, res) => {
+      const screenings = await messages.findAll()
+      res.json(screenings)
+    })
+  )
 
   router.post(
     '/',

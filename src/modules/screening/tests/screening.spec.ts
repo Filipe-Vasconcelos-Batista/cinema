@@ -1,35 +1,40 @@
-import supertest from 'supertest'
-import createApp from '@/app'
-import { Screening } from '../schema'
-import { Database } from '@/database'
-import buildRespository from '../repository'
-// Mock the database and the repository
-const mockDb: Partial<Database> = {}
-const mockRepo = buildRespository(mockDb as Database)
+import request from 'supertest'
+import express from 'express'
+import { vi } from 'vitest'
+import type { Kysely } from 'kysely'
+import type { Database } from '@/database'
+import yourRouter from '../controller'
 
-// Mock the insertScreen method
-mockRepo.insertScreen = vi.fn().mockResolvedValue({})
+describe('Screening tests', () => {
+  const mockDb: Kysely<any> = {
+    insertInto: vi.fn().mockReturnThis(),
+    values: vi.fn().mockReturnThis(),
+    execute: vi.fn().mockReturnThis(),
+  }
 
-const app = createApp(mockDb as Database)
+  const app = express()
+  app.use(express.json())
+  app.use('/', yourRouter(mockDb))
 
-describe('POST /screening', () => {
-  it('should insert a new screening and return a success message', async () => {
-    const newScreening: Screening = {
-      movieId: 133093,
-      time: '2022-12-31T22:30',
-      totalTickets: 30,
-      takenTickets: 0,
+  it('POST /', async () => {
+    const screening = {
+      movieId: 1,
+      time: '2024-02-13T05:10:47.851Z',
+      totalTickets: 100,
+      takenTickets: 50,
     }
 
-    const response = await supertest(app)
-      .post('/screening')
-      .send(newScreening)
-      .expect(200)
+    const res = await request(app).post('/').send(screening)
 
-    expect(response.body).toEqual({
-      message: `Screening insert successfully ${JSON.stringify(newScreening)}`,
+    expect(res.statusCode).toEqual(200)
+    expect(res.body).toHaveProperty('message')
+    expect(mockDb.insertInto).toHaveBeenCalledWith('screening')
+    expect(mockDb.values).toHaveBeenCalledWith({
+      movie_id: screening.movieId,
+      time: screening.time,
+      total_tickets: screening.totalTickets,
+      taken_tickets: screening.takenTickets,
     })
-
-    expect(mockRepo.insertScreen).toHaveBeenCalledWith(newScreening)
+    expect(mockDb.execute).toHaveBeenCalled()
   })
 })
